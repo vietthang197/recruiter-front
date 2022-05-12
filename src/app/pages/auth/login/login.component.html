@@ -1,0 +1,36 @@
+<div class="container mx-auto max-w-xl items-center h-screen content-center">
+  <div class="h-screen flex flex-col justify-center justify-items-center content-center px-2">
+    <nz-spin [nzSize]="'large'" [nzSpinning]="isSpinning" [nzDelay]="0">
+      <h3 nz-typography class="text-center">Đăng nhập vào HeadHunt</h3>
+      <form nz-form>
+        <nz-form-item>
+          <nz-form-control nzErrorTip="Nhập tên đăng nhập!">
+            <nz-input-group nzPrefixIcon="user">
+              <input type="text" nz-input  placeholder="Tên đăng nhập" />
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-control nzErrorTip="Nhập mật khẩu!">
+            <nz-input-group nzPrefixIcon="lock">
+              <input type="password" nz-input placeholder="Mật khẩu" />
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+        <div nz-row class="login-form-margin">
+          <div nz-col [nzSpan]="12">
+            <label nz-checkbox >
+              <span>Lưu mật khẩu</span>
+            </label>
+          </div>
+          <div nz-col [nzSpan]="12">
+            <a class="login-form-forgot">Quên mật khẩu?</a>
+          </div>
+        </div>
+        <button nz-button  (click)="doLogin()" class="login-form-button login-form-margin" [nzType]="'primary'">Đăng nhập</button>
+        Hoặc
+        <a>Đăng ký ngay!</a>
+      </form>
+    </nz-spin>
+  </div>
+</div>
