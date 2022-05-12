@@ -6,7 +6,7 @@
             [(nzCollapsed)]="isCollapsed"
             [nzTrigger]="null">
     <div class="sidebar-logo">
-      <a href="https://ng.ant.design/" target="_blank">
+      <a routerLink="/admin" target="_self">
         <img src="https://ng.ant.design/assets/img/logo.svg" alt="logo">
         <h1 class="font-sans">Recuiter Admin</h1>
       </a>
@@ -46,10 +46,10 @@
       </div>
     </nz-header>
     <nz-content>
-      <div class="inner-content">
+      <div class="inner-content overflow-y-scroll">
         <router-outlet></router-outlet>
       </div>
     </nz-content>
-    <nz-footer>Admin template design by Thắng đẹp trai</nz-footer>
+    <nz-footer class="px-1 py-2 text-center">Admin template design by Thắng đẹp trai</nz-footer>
   </nz-layout>
 </nz-layout>
