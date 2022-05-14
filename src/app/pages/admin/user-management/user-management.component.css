@@ -32,3 +32,9 @@ button {
 .search-area {
   text-align: left;
 }
+
+.btn-edit {
+  background-color: rgb(250 204 21) !important;
+  border-color: rgb(254 240 138) !important;
+  color: #fff;
+}
