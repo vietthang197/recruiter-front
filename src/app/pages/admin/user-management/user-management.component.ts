@@ -1,14 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {NzModalService} from "ng-zorro-antd/modal";
 import {UserManagementService} from "./user-management.service";
-
-interface ItemData {
-  id: number;
-  name: string;
-  age: number;
-  address: string;
-}
+import {UserInfoModel} from "../../../models/user_info.model";
+import {RoleModel} from "../../../models/role.model";
 
 @Component({
   selector: 'app-user-management',
@@ -18,9 +13,23 @@ interface ItemData {
 
 export class UserManagementComponent implements OnInit {
 
-  validateForm!: FormGroup;
+  formSearch!: FormGroup;
+  formCreate!: FormGroup;
   controlArray: Array<{ index: number; show: boolean }> = [];
   isCollapse = true;
+  checked = false;
+  loading = false;
+  indeterminate = false;
+  listOfData: readonly UserInfoModel[] = [];
+  listOfCurrentPageData: readonly UserInfoModel[] = [];
+  setOfCheckedId = new Set<number>();
+  passwordVisible = false;
+  password?: string;
+  isVisible = false;
+  isConfirmLoading = false;
+  listOfRole: readonly RoleModel[] = [];
+  isSpinning = false;
+  isSaving = false;
 
   constructor(private fb: FormBuilder, private modalService: NzModalService, private userManagementService: UserManagementService) {}
 
@@ -32,51 +41,44 @@ export class UserManagementComponent implements OnInit {
   }
 
   resetForm(): void {
-    this.validateForm.reset();
+    this.formSearch.reset();
   }
 
   ngOnInit(): void {
-    this.validateForm = this.fb.group({});
+    this.formSearch = this.fb.group({});
     for (let i = 0; i < 6; i++) {
       this.controlArray.push({ index: i, show: i < 3 });
-      this.validateForm.addControl(`field${i}`, new FormControl());
+      this.formSearch.addControl(`field${i}`, new FormControl());
     }
 
-    this.listOfData = new Array(200).fill(0).map((_, index) => ({
-      id: index,
-      name: `Edward King ${index}`,
-      age: 32,
-      address: `London, Park Lane no. ${index}`
-    }));
-
+    this.formCreate = this.fb.group({
+      username_insert: ['', [Validators.required]],
+      role_insert: [[], [Validators.required]],
+      password_insert: ['', [Validators.required]],
+      email_insert: ['', [Validators.email, Validators.required]],
+    });
+    this.isSpinning = true;
     this.loadingUserInfo();
   }
 
-  isVisible = false;
-  isConfirmLoading = false;
-
   showModal1(): void {
+    this.loadAllRole();
     this.isVisible = true;
   }
 
   handleOk(): void {
     this.isConfirmLoading = true;
+    this.isSaving = true;
     setTimeout(() => {
       this.isVisible = false;
       this.isConfirmLoading = false;
+      this.isSaving = false;
     }, 3000);
   }
 
   handleCancel(): void {
     this.isVisible = false;
   }
-
-  checked = false;
-  loading = false;
-  indeterminate = false;
-  listOfData: readonly ItemData[] = [];
-  listOfCurrentPageData: readonly ItemData[] = [];
-  setOfCheckedId = new Set<number>();
 
   sendRequest(): void {
     this.loading = true;
@@ -134,7 +136,7 @@ export class UserManagementComponent implements OnInit {
     this.refreshCheckedStatus();
   }
 
-  onCurrentPageDataChange($event: readonly ItemData[]): void {
+  onCurrentPageDataChange($event: readonly UserInfoModel[]): void {
     this.listOfCurrentPageData = $event;
     this.refreshCheckedStatus();
   }
@@ -145,7 +147,7 @@ export class UserManagementComponent implements OnInit {
   }
 
   showDeleteConfirm(): void {
-    this.modalService.confirm({
+    let isConfirm = this.modalService.confirm({
       nzTitle: 'Bạn có muốn xoá dữ liệu này?',
       nzOkText: 'Đồng ý',
       nzOkType: 'primary',
@@ -157,8 +159,24 @@ export class UserManagementComponent implements OnInit {
   }
 
   loadingUserInfo() : void {
-    this.userManagementService.getAll().subscribe((data) => {
-      console.log(data);
-    });
+    this.userManagementService.getAllUserInfo().subscribe(
+      (value: UserInfoModel[]) => {
+        this.isSpinning = false;
+        this.listOfData = value;
+      },
+      error => {
+        this.isSpinning = false;
+      },
+    )
+  }
+
+  toListRoleName(roles: RoleModel[]) {
+    return roles.map(item => item.name).join(",");
+  }
+
+  loadAllRole(): void {
+    this.userManagementService.getAllRole().subscribe((data) => {
+      this.listOfRole = data;
+    })
   }
 }
