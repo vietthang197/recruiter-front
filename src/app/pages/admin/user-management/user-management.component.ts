@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {NzModalService} from "ng-zorro-antd/modal";
-import {UserManagementService} from "./user-management.service";
 
 interface ItemData {
   id: number;
@@ -22,7 +21,7 @@ export class UserManagementComponent implements OnInit {
   controlArray: Array<{ index: number; show: boolean }> = [];
   isCollapse = true;
 
-  constructor(private fb: FormBuilder, private modalService: NzModalService, private userManagementService: UserManagementService) {}
+  constructor(private fb: FormBuilder, private modalService: NzModalService) {}
 
   toggleCollapse(): void {
     this.isCollapse = !this.isCollapse;
@@ -157,6 +156,6 @@ export class UserManagementComponent implements OnInit {
   }
 
   loadingUserInfo() : void {
-    this.userManagementService.getAll();
+    // this.userManagementService.getAll();
   }
 }
