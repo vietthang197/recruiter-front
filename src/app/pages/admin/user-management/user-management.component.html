@@ -19,11 +19,11 @@
                 </div>
                 <div nz-col [nzSpan]="8">
                   <nz-form-item>
-                    <nz-form-label [nzFor]="'field2'">Role</nz-form-label>
+                    <nz-form-label [nzFor]="'field2'">Quyền</nz-form-label>
                     <nz-form-control>
                       <input
                         nz-input
-                        placeholder="Tìm theo role"
+                        placeholder="Tìm theo quyền"
                       />
                     </nz-form-control>
                   </nz-form-item>
@@ -48,7 +48,6 @@
             <i nz-icon nzType="plus"></i>
             Thêm mới
           </button>
-
           <button class="rounded align-middle" nz-button nzType="primary" nzDanger (click)="showDeleteConfirm()">
             <i nz-icon nzType="delete"></i>
             Xoá
@@ -70,9 +69,11 @@
               [nzIndeterminate]="indeterminate"
               (nzCheckedChange)="onAllChecked($event)"
             ></th>
-            <th>Name</th>
-            <th>Age</th>
-            <th>Address</th>
+            <th>Username</th>
+            <th>Full name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Quyền</th>
             <th>Action</th>
           </tr>
           </thead>
@@ -82,6 +83,8 @@
             <td>{{ data.name }}</td>
             <td>{{ data.age }}</td>
             <td>{{ data.address }}</td>
+            <td>Test</td>
+            <td>Test</td>
             <td>
               <button class="rounded btn-edit" nz-button [nzType]="'default'">Sửa</button>
             </td>
