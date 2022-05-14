@@ -5,25 +5,22 @@ import {map, Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {GlobalConstants} from "../../../constants/GlobalConstants";
 
-@Injectable()
-export class UserManagementService extends DefaultDataService<UserInfoModel> {
+@Injectable({
+  providedIn: 'root',
+})
+export class UserManagementService {
 
   private readonly API_NAME = 'user-info';
 
-  constructor(http: HttpClient, httpUrlGenerator: HttpUrlGenerator) {
-    super('userInfoModel', http, httpUrlGenerator);
+  constructor(private http: HttpClient) {
   }
 
-  override getAll(): Observable<UserInfoModel[]> {
+  getAll(): Observable<UserInfoModel[]> {
     return this.http
-      .get(GlobalConstants.API_MOCK_ENDPOINT + this.API_NAME + "/search")
+      .post(GlobalConstants.API_ENDPOINT + this.API_NAME + "/search", {page: 0, size: 10})
       .pipe(
         map((data: any) => {
-          const userInfoModel: UserInfoModel[] = [];
-          for (let key in data) {
-            userInfoModel.push({...data[key], id: key});
-          }
-          return userInfoModel;
+          return data.data.data;
         })
       );
   }

@@ -9,12 +9,15 @@ import {UserManagementComponent} from './user-management/user-management.compone
 import {DemoNgZorroAntdModule} from "../../ng-zorro-antd.module";
 import {ReactiveFormsModule} from "@angular/forms";
 import en from "@angular/common/locales/en";
+import {UserManagementService} from "./user-management/user-management.service";
+import {HttpClientModule} from "@angular/common/http";
 
 registerLocaleData(en);
 
 @NgModule({
-  imports: [AdminRoutingModule, NzLayoutModule, NzMenuModule, IconsProviderModule, DemoNgZorroAntdModule, ReactiveFormsModule, CommonModule],
+  imports: [AdminRoutingModule, NzLayoutModule, NzMenuModule, IconsProviderModule, HttpClientModule, DemoNgZorroAntdModule, ReactiveFormsModule, CommonModule],
   declarations: [AdminComponent, UserManagementComponent],
-  exports: [AdminComponent]
+  exports: [AdminComponent],
+  providers: [UserManagementService]
 })
 export class AdminModule { }
