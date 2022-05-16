@@ -52,10 +52,12 @@ export class UserManagementComponent implements OnInit {
     }
 
     this.formCreate = this.fb.group({
-      username_insert: ['', [Validators.required]],
-      role_insert: [[], [Validators.required]],
-      password_insert: ['', [Validators.required]],
-      email_insert: ['', [Validators.email, Validators.required]],
+      username: ['', [Validators.required]],
+      roles: [[], [Validators.required]],
+      password: ['', [Validators.required]],
+      email: ['', [Validators.email, Validators.required]],
+      phone: ['', [Validators.required]],
+      fullName: ['', [Validators.required]],
     });
     this.isSpinning = true;
     this.loadingUserInfo();
@@ -69,15 +71,43 @@ export class UserManagementComponent implements OnInit {
   handleOk(): void {
     this.isConfirmLoading = true;
     this.isSaving = true;
-    setTimeout(() => {
-      this.isVisible = false;
-      this.isConfirmLoading = false;
+
+    // do save userInfo
+    this.userManagementService.adminCreateUser(this.formCreate.value).subscribe((next) => {
+      if (next.status == 200) {
+        this.modalService.success({
+          nzTitle: 'Thông báo',
+          nzContent: 'Thêm mới người dùng thành công',
+          nzOkText: 'OK'
+        });
+        this.isVisible = false;
+        this.formCreate.reset();
+        setTimeout(() => {
+          this.loadingUserInfo();
+        },2000);
+
+      } else {
+        this.modalService.error({
+          nzTitle: 'Thông báo',
+          nzContent: next.message,
+          nzOkText: 'OK'
+        });
+      }
+    }, (error) => {
+      this.modalService.error({
+        nzTitle: 'Thông báo',
+        nzContent: 'Đã có lỗi xảy ra, vui lòng thử lại',
+        nzOkText: 'OK'
+      });
+    }, () => {
       this.isSaving = false;
-    }, 3000);
+      this.isConfirmLoading = false;
+    })
   }
 
   handleCancel(): void {
     this.isVisible = false;
+    this.formCreate.reset();
   }
 
   sendRequest(): void {
@@ -165,6 +195,7 @@ export class UserManagementComponent implements OnInit {
         this.listOfData = value;
       },
       error => {
+        console.log(error)
         this.isSpinning = false;
       },
     )

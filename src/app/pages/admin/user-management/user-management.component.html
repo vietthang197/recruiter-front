@@ -98,26 +98,26 @@
       </div>
     </div>
     <nz-modal [nzMaskClosable]="false" [nzWidth]="'65%'" [(nzVisible)]="isVisible" nzTitle="Thêm mới người dùng"
-              (nzOnCancel)="handleCancel()">
+              (nzOnCancel)="handleCancel()" [nzClosable]="false">
       <div *nzModalContent>
         <form nz-form [formGroup]="formCreate" (ngSubmit)="submitForm()">
           <div class="ant-row">
             <nz-form-item class="ant-col ant-col-sm-24 ant-col-md-24 ant-col-lg-12">
               <div class="ant-row ant-form-item">
-                <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="username_insert">Tên đăng nhập</nz-form-label>
+                <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="username">Tên đăng nhập</nz-form-label>
                 <nz-form-control  [nzSpan]="12" nzErrorTip="Nhập tên đăng nhập!">
-                  <input id="username_insert" formControlName="username_insert" type="text" nz-input
+                  <input id="username" formControlName="username" type="text" nz-input
                          placeholder="Nhập tên đăng nhập"/>
                 </nz-form-control>
               </div>
             </nz-form-item>
             <nz-form-item class="ant-col ant-col-sm-24 ant-col-md-24 ant-col-lg-12">
               <div class="ant-row ant-form-item">
-                <nz-form-label class="text-left"  [nzSpan]="8" nzFor="role_insert" nzRequired>Quyền</nz-form-label>
+                <nz-form-label class="text-left"  [nzSpan]="8" nzFor="roles" nzRequired>Quyền</nz-form-label>
                 <nz-form-control  [nzSpan]="12" nzErrorTip="Chọn quyền!">
                   <nz-select
-                    id="role_insert"
-                    formControlName="role_insert"
+                    id="roles"
+                    formControlName="roles"
                     nzPlaceHolder="Chọn quyền!"
                     nzMode="multiple">
                     <nz-option *ngFor="let roleItem of listOfRole" [nzValue]="roleItem.id"
@@ -130,12 +130,12 @@
           <div class="ant-row">
             <nz-form-item class="ant-col ant-col-sm-24 ant-col-md-24 ant-col-lg-12">
               <div class="ant-row ant-form-item">
-                <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="password_insert">Mật khẩu</nz-form-label>
+                <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="password">Mật khẩu</nz-form-label>
                 <nz-form-control [nzSpan]="12" nzErrorTip="Nhập mật khẩu!">
                   <nz-input-group [nzSuffix]="suffixTemplate">
                     <input
-                      id="password_insert"
-                      formControlName="password_insert"
+                      id="password"
+                      formControlName="password"
                       [type]="passwordVisible ? 'text' : 'password'"
                       nz-input
                       placeholder="Nhập mật khẩu"
@@ -150,9 +150,9 @@
             </nz-form-item>
             <nz-form-item class="ant-col ant-col-sm-24 ant-col-md-24 ant-col-lg-12">
               <div class="ant-row ant-form-item">
-                <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="email_insert">Email</nz-form-label>
+                <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="email">Email</nz-form-label>
                 <nz-form-control [nzSpan]="12" nzErrorTip="Nhập email!">
-                  <input id="email_insert" formControlName="email_insert" type="email" nz-input placeholder="Nhập email"/>
+                  <input id="email" formControlName="email" type="email" nz-input placeholder="Nhập email"/>
                 </nz-form-control>
               </div>
             </nz-form-item>
@@ -160,18 +160,18 @@
           <div class="ant-row">
             <nz-form-item class="ant-col ant-col-sm-24 ant-col-md-24 ant-col-lg-12">
               <div class="ant-row ant-form-item">
-                <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="username_insert">Số điện thoại</nz-form-label>
+                <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="phone">Số điện thoại</nz-form-label>
                 <nz-form-control  [nzSpan]="12" nzErrorTip="Nhập số điện thoại!">
-                  <input id="phone_insert" formControlName="username_insert" type="text" nz-input
+                  <input id="phone" formControlName="phone" type="tel" nz-input
                          placeholder="Nhập số điện thoại"/>
                 </nz-form-control>
               </div>
             </nz-form-item>
             <nz-form-item class="ant-col ant-col-sm-24 ant-col-md-24 ant-col-lg-12">
               <div class="ant-row ant-form-item">
-                <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="username_insert">Họ và tên</nz-form-label>
+                <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="fullName">Họ và tên</nz-form-label>
                 <nz-form-control  [nzSpan]="12" nzErrorTip="Nhập họ và tên!">
-                  <input id="fullName_insert" formControlName="username_insert" type="text" nz-input
+                  <input id="fullName" formControlName="fullName" type="text" nz-input
                          placeholder="Nhập họ và tên"/>
                 </nz-form-control>
               </div>
