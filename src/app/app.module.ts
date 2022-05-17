@@ -11,6 +11,13 @@ import {AppRoutingModule} from './app-routing.module';
 import {IconsProviderModule} from './icons-provider.module';
 import {LoginComponent} from './pages/auth/login/login.component';
 import {DemoNgZorroAntdModule} from "./ng-zorro-antd.module";
+import {en_US, NZ_I18N} from "ng-zorro-antd/i18n";
+
+const customLanguagePack = {
+  en_US,
+}
+
+customLanguagePack.en_US.Pagination.items_per_page = "bản ghi";
 
 registerLocaleData(en);
 
@@ -28,6 +35,7 @@ registerLocaleData(en);
     IconsProviderModule,
     DemoNgZorroAntdModule
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  providers: [{ provide: NZ_I18N, useValue: customLanguagePack }]
 })
 export class AppModule { }

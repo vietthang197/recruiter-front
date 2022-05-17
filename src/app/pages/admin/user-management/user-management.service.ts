@@ -5,6 +5,8 @@ import {HttpClient} from "@angular/common/http";
 import {GlobalConstants} from "../../../constants/GlobalConstants";
 import {RoleModel} from "../../../models/role.model";
 import {BaseResponseModel} from "../../../models/base_response.model";
+import {SearchUserInfoModel} from "../../../models/search/search_userinfo_model";
+import {BasePagingResponseModel} from "../../../models/base_paging_response_model";
 
 @Injectable({
   providedIn: 'root',
@@ -17,14 +19,14 @@ export class UserManagementService {
   constructor(private http: HttpClient) {
   }
 
-  getAllUserInfo(): Observable<UserInfoModel[]> {
+  getAllUserInfo(query: SearchUserInfoModel): Observable<BasePagingResponseModel<UserInfoModel>> {
     return this.http
-      .post(GlobalConstants.API_ENDPOINT + this.API_USER_INFO_NAME + "/search", {page: 0, size: 10})
+      .post(GlobalConstants.API_ENDPOINT + this.API_USER_INFO_NAME + "/search", query)
       .pipe(
-        map((response: any) => {
-          return response.data.data;
+        map((response:BasePagingResponseModel<UserInfoModel>) => {
+          return response;
         })
-      );
+      )
   }
 
   getAllRole(): Observable<RoleModel[]> {
@@ -35,9 +37,25 @@ export class UserManagementService {
     );
   }
 
-  adminCreateUser(value: any): Observable<BaseResponseModel> {
+  adminCreateUser(value: any): Observable<BaseResponseModel<UserInfoModel>> {
     return this.http.post(GlobalConstants.API_ENDPOINT + this.API_USER_INFO_NAME + "/create", value).pipe(
-      map((response:BaseResponseModel) => {
+      map((response:BaseResponseModel<UserInfoModel>) => {
+        return response;
+      })
+    )
+  }
+
+  adminDeleteUser(value: any): Observable<BaseResponseModel<Object>> {
+    return this.http.post(GlobalConstants.API_ENDPOINT + this.API_USER_INFO_NAME + "/delete", value).pipe(
+      map((response: any) => {
+        return response;
+      })
+    )
+  }
+
+  adminEditUser(value:any): Observable<BaseResponseModel<Object>> {
+    return this.http.post(GlobalConstants.API_ENDPOINT + this.API_USER_INFO_NAME + "/update", value).pipe(
+      map((response: any) => {
         return response;
       })
     )

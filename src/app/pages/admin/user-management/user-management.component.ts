@@ -1,9 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {NzModalService} from "ng-zorro-antd/modal";
 import {UserManagementService} from "./user-management.service";
 import {UserInfoModel} from "../../../models/user_info.model";
 import {RoleModel} from "../../../models/role.model";
+import {SearchUserInfoModel} from "../../../models/search/search_userinfo_model";
+import {BasePagingResponseModel} from "../../../models/base_paging_response_model";
+import {BaseResponseModel} from "../../../models/base_response.model";
 
 @Component({
   selector: 'app-user-management',
@@ -15,6 +18,7 @@ export class UserManagementComponent implements OnInit {
 
   formSearch!: FormGroup;
   formCreate!: FormGroup;
+  formEdit!: FormGroup;
   controlArray: Array<{ index: number; show: boolean }> = [];
   isCollapse = true;
   checked = false;
@@ -26,10 +30,15 @@ export class UserManagementComponent implements OnInit {
   passwordVisible = false;
   password?: string;
   isVisible = false;
+  isVisibleEdit = false;
   isConfirmLoading = false;
   listOfRole: readonly RoleModel[] = [];
   isSpinning = false;
   isSaving = false;
+  //pagination
+  totalData:number = 0;
+  pageIndex:number = 1;
+  pageSize:number = 10;
 
   constructor(private fb: FormBuilder, private modalService: NzModalService, private userManagementService: UserManagementService) {}
 
@@ -40,16 +49,15 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
-  resetForm(): void {
+  resetFormSearch(): void {
     this.formSearch.reset();
   }
 
   ngOnInit(): void {
-    this.formSearch = this.fb.group({});
-    for (let i = 0; i < 6; i++) {
-      this.controlArray.push({ index: i, show: i < 3 });
-      this.formSearch.addControl(`field${i}`, new FormControl());
-    }
+    this.formSearch = this.fb.group({
+      username_search: [null, []],
+      email_search: [null, []]
+    });
 
     this.formCreate = this.fb.group({
       username: ['', [Validators.required]],
@@ -59,6 +67,16 @@ export class UserManagementComponent implements OnInit {
       phone: ['', [Validators.required]],
       fullName: ['', [Validators.required]],
     });
+
+    this.formEdit = this.fb.group({
+      username: ['', [Validators.required]],
+      roles: [[], [Validators.required]],
+      email: ['', [Validators.email, Validators.required]],
+      phone: ['', [Validators.required]],
+      fullName: ['', [Validators.required]],
+      id: [null, []]
+    });
+
     this.isSpinning = true;
     this.loadingUserInfo();
   }
@@ -82,10 +100,7 @@ export class UserManagementComponent implements OnInit {
         });
         this.isVisible = false;
         this.formCreate.reset();
-        setTimeout(() => {
-          this.loadingUserInfo();
-        },2000);
-
+        this.loadingUserInfo();
       } else {
         this.modalService.error({
           nzTitle: 'Thông báo',
@@ -177,28 +192,69 @@ export class UserManagementComponent implements OnInit {
   }
 
   showDeleteConfirm(): void {
-    let isConfirm = this.modalService.confirm({
-      nzTitle: 'Bạn có muốn xoá dữ liệu này?',
+    console.log({
+      listId: [...this.setOfCheckedId.values()]
+    })
+    this.modalService.confirm({
+      nzTitle: `Bạn có muốn xoá ${this.setOfCheckedId.size} dữ liệu này?`,
       nzOkText: 'Đồng ý',
       nzOkType: 'primary',
       nzOkDanger: true,
-      nzOnOk: () => console.log('OK'),
+      nzOnOk: () => {
+        this.userManagementService.adminDeleteUser({
+          listId: [...this.setOfCheckedId.values()]
+        }).subscribe((response: BaseResponseModel<Object>) => {
+          if (200 == response.status) {
+            this.setOfCheckedId.clear();
+            this.refreshCheckedStatus();
+            this.modalService.success({
+              nzTitle: 'Thông báo',
+              nzContent: 'Xoá thành công',
+              nzOkText: 'OK'
+            });
+            this.loadingUserInfo();
+          } else {
+            this.modalService.error({
+              nzTitle: 'Thông báo',
+              nzContent: 'Xoá thất bại',
+              nzOkText: 'OK'
+            });
+          }
+        }, (error) => {
+          this.modalService.error({
+            nzTitle: 'Thông báo',
+            nzContent: 'Có lỗi xảy ra, vui lòng thử lại',
+            nzOkText: 'OK'
+          });
+        });
+      },
       nzCancelText: 'Huỷ',
       nzOnCancel: () => console.log('Cancel')
     });
   }
 
   loadingUserInfo() : void {
-    this.userManagementService.getAllUserInfo().subscribe(
-      (value: UserInfoModel[]) => {
+    let query: SearchUserInfoModel = {
+      page: this.pageIndex - 1,
+      size: this.pageSize,
+      username: this.isEmpty(this.formSearch.controls['username_search'].value) ? null : this.formSearch.controls['username_search'].value,
+      email: this.isEmpty(this.formSearch.controls['email_search'].value) ? null : this.formSearch.controls['email_search'].value,
+    }
+    this.userManagementService.getAllUserInfo(query).subscribe(
+      (value: BasePagingResponseModel<UserInfoModel>) => {
         this.isSpinning = false;
-        this.listOfData = value;
+        this.listOfData = value.data?.data? value.data.data : [];
+        this.totalData = value.data?.total? value.data.total : 0;
       },
       error => {
         console.log(error)
         this.isSpinning = false;
       },
     )
+  }
+
+  isEmpty(str:string) {
+    return (!str || str.length === 0 );
   }
 
   toListRoleName(roles: RoleModel[]) {
@@ -208,6 +264,74 @@ export class UserManagementComponent implements OnInit {
   loadAllRole(): void {
     this.userManagementService.getAllRole().subscribe((data) => {
       this.listOfRole = data;
+    })
+  }
+
+  loadAllRoleAndFill(roles: RoleModel[]): void {
+    this.userManagementService.getAllRole().subscribe((data) => {
+      this.listOfRole = data;
+      this.formEdit.controls['roles'].setValue(roles.map(item => item.id));
+    })
+  }
+
+  changePageIndex($event: number) {
+    this.pageIndex = $event.valueOf();
+    this.loadingUserInfo();
+  }
+
+  changePageSize($event: number) {
+    this.pageSize = $event.valueOf();
+    console.log('pageSize', this.pageSize)
+    this.loadingUserInfo();
+  }
+
+  showModal2(data: UserInfoModel) {
+    this.loadAllRoleAndFill(data.roles);
+    this.formEdit.controls['username'].setValue(data.username);
+    this.formEdit.controls['email'].setValue(data.email);
+    this.formEdit.controls['phone'].setValue(data.phone);
+    this.formEdit.controls['fullName'].setValue(data.fullName);
+    this.formEdit.controls['id'].setValue(data.id);
+    this.formEdit.controls['username'].disable();
+    this.isVisibleEdit = true;
+  }
+
+  handleCancelEdit() {
+    this.isVisibleEdit = false;
+    this.formEdit.reset();
+  }
+
+  handleOkEdit() {
+    this.isConfirmLoading = true;
+    this.isSaving = true;
+
+    // do update userInfo
+    this.userManagementService.adminEditUser(this.formEdit.getRawValue()).subscribe((next) => {
+      if (next.status == 200) {
+        this.modalService.success({
+          nzTitle: 'Thông báo',
+          nzContent: 'Sửa người dùng thành công',
+          nzOkText: 'OK'
+        });
+        this.isVisibleEdit = false;
+        this.formEdit.reset();
+        this.loadingUserInfo();
+      } else {
+        this.modalService.error({
+          nzTitle: 'Thông báo',
+          nzContent: next.message,
+          nzOkText: 'OK'
+        });
+      }
+    }, (error) => {
+      this.modalService.error({
+        nzTitle: 'Thông báo',
+        nzContent: 'Đã có lỗi xảy ra, vui lòng thử lại',
+        nzOkText: 'OK'
+      });
+    }, () => {
+      this.isSaving = false;
+      this.isConfirmLoading = false;
     })
   }
 }

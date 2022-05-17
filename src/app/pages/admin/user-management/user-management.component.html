@@ -10,9 +10,11 @@
                 <div nz-row [nzGutter]="24">
                   <div nz-col [nzSpan]="8">
                     <nz-form-item>
-                      <nz-form-label [nzFor]="'field1'">Tên đăng nhập</nz-form-label>
+                      <nz-form-label [nzFor]="'username_search'">Tên đăng nhập</nz-form-label>
                       <nz-form-control>
                         <input
+                          id="username_search"
+                          formControlName="username_search"
                           nz-input
                           placeholder="Tìm theo tên đăng nhập"
                         />
@@ -21,18 +23,20 @@
                   </div>
                   <div nz-col [nzSpan]="8">
                     <nz-form-item>
-                      <nz-form-label [nzFor]="'field2'">Quyền</nz-form-label>
+                      <nz-form-label [nzFor]="'email_search'">Email</nz-form-label>
                       <nz-form-control>
                         <input
+                          id="email_search"
+                          formControlName="email_search"
                           nz-input
-                          placeholder="Tìm theo quyền"
+                          placeholder="Tìm theo email"
                         />
                       </nz-form-control>
                     </nz-form-item>
                   </div>
                   <div nz-col [nzSpan]="8" class="search-area">
-                    <button class="rounded" nz-button [nzType]="'primary'">Tìm kiếm</button>
-                    <button class="rounded" nz-button (click)="resetForm()">Làm mới</button>
+                    <button class="rounded" nz-button [nzType]="'primary'" (click)="loadingUserInfo()">Tìm kiếm</button>
+                    <button class="rounded" nz-button (click)="resetFormSearch()">Làm mới</button>
                     <button class="rounded" nz-button [nzType]="'primary'" (click)="toggleCollapse()">
                       Thêm
                       <i nz-icon [nzType]="isCollapse ? 'down' : 'up'"></i>
@@ -63,6 +67,12 @@
             nzShowSizeChanger
             [nzData]="listOfData"
             (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
+            [nzTotal]="totalData"
+            [nzPageIndex]="pageIndex"
+            [nzPageSize]="pageSize"
+            [nzFrontPagination]="false"
+            (nzPageIndexChange)="changePageIndex($event)"
+            (nzPageSizeChange)="changePageSize($event)"
           >
             <thead>
             <tr>
@@ -89,7 +99,7 @@
               <td>{{ data.phone }}</td>
               <td>{{ toListRoleName(data.roles) }}</td>
               <td>
-                <button class="rounded btn-edit" nz-button [nzType]="'default'">Sửa</button>
+                <button class="rounded btn-edit" nz-button [nzType]="'default'" (click)="showModal2(data)">Sửa</button>
               </td>
             </tr>
             </tbody>
@@ -97,6 +107,7 @@
         </div>
       </div>
     </div>
+<!--    modal create-->
     <nz-modal [nzMaskClosable]="false" [nzWidth]="'65%'" [(nzVisible)]="isVisible" nzTitle="Thêm mới người dùng"
               (nzOnCancel)="handleCancel()" [nzClosable]="false">
       <div *nzModalContent>
@@ -106,7 +117,7 @@
               <div class="ant-row ant-form-item">
                 <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="username">Tên đăng nhập</nz-form-label>
                 <nz-form-control  [nzSpan]="12" nzErrorTip="Nhập tên đăng nhập!">
-                  <input id="username" formControlName="username" type="text" nz-input
+                  <input  formControlName="username" type="text" nz-input
                          placeholder="Nhập tên đăng nhập"/>
                 </nz-form-control>
               </div>
@@ -116,7 +127,6 @@
                 <nz-form-label class="text-left"  [nzSpan]="8" nzFor="roles" nzRequired>Quyền</nz-form-label>
                 <nz-form-control  [nzSpan]="12" nzErrorTip="Chọn quyền!">
                   <nz-select
-                    id="roles"
                     formControlName="roles"
                     nzPlaceHolder="Chọn quyền!"
                     nzMode="multiple">
@@ -134,7 +144,6 @@
                 <nz-form-control [nzSpan]="12" nzErrorTip="Nhập mật khẩu!">
                   <nz-input-group [nzSuffix]="suffixTemplate">
                     <input
-                      id="password"
                       formControlName="password"
                       [type]="passwordVisible ? 'text' : 'password'"
                       nz-input
@@ -152,7 +161,7 @@
               <div class="ant-row ant-form-item">
                 <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="email">Email</nz-form-label>
                 <nz-form-control [nzSpan]="12" nzErrorTip="Nhập email!">
-                  <input id="email" formControlName="email" type="email" nz-input placeholder="Nhập email"/>
+                  <input formControlName="email" type="email" nz-input placeholder="Nhập email"/>
                 </nz-form-control>
               </div>
             </nz-form-item>
@@ -162,7 +171,7 @@
               <div class="ant-row ant-form-item">
                 <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="phone">Số điện thoại</nz-form-label>
                 <nz-form-control  [nzSpan]="12" nzErrorTip="Nhập số điện thoại!">
-                  <input id="phone" formControlName="phone" type="tel" nz-input
+                  <input formControlName="phone" type="tel" nz-input
                          placeholder="Nhập số điện thoại"/>
                 </nz-form-control>
               </div>
@@ -171,7 +180,7 @@
               <div class="ant-row ant-form-item">
                 <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="fullName">Họ và tên</nz-form-label>
                 <nz-form-control  [nzSpan]="12" nzErrorTip="Nhập họ và tên!">
-                  <input id="fullName" formControlName="fullName" type="text" nz-input
+                  <input formControlName="fullName" type="text" nz-input
                          placeholder="Nhập họ và tên"/>
                 </nz-form-control>
               </div>
@@ -182,6 +191,76 @@
       <div *nzModalFooter>
         <button nz-button nzType="default" nzDanger (click)="handleCancel()" [disabled]="isSaving">Huỷ</button>
         <button nz-button nzType="primary" [disabled]="!formCreate.valid" (click)="handleOk()"
+                [nzLoading]="isConfirmLoading">Lưu
+        </button>
+      </div>
+    </nz-modal>
+
+<!--    modal edit-->
+    <nz-modal [nzMaskClosable]="false" [nzWidth]="'65%'" [(nzVisible)]="isVisibleEdit" nzTitle="Sửa thông tin người dùng"
+              (nzOnCancel)="handleCancelEdit()" [nzClosable]="false">
+      <div *nzModalContent>
+        <form nz-form [formGroup]="formEdit" (ngSubmit)="submitForm()">
+          <div class="ant-row">
+            <nz-form-item class="ant-col ant-col-sm-24 ant-col-md-24 ant-col-lg-12">
+              <div class="ant-row ant-form-item">
+                <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="username">Tên đăng nhập</nz-form-label>
+                <nz-form-control  [nzSpan]="12" nzErrorTip="Nhập tên đăng nhập!">
+                  <input formControlName="username" type="text" nz-input
+                         placeholder="Nhập tên đăng nhập"/>
+                </nz-form-control>
+              </div>
+            </nz-form-item>
+            <nz-form-item class="ant-col ant-col-sm-24 ant-col-md-24 ant-col-lg-12">
+              <div class="ant-row ant-form-item">
+                <nz-form-label class="text-left"  [nzSpan]="8" nzFor="roles" nzRequired>Quyền</nz-form-label>
+                <nz-form-control  [nzSpan]="12" nzErrorTip="Chọn quyền!">
+                  <nz-select
+                    formControlName="roles"
+                    nzPlaceHolder="Chọn quyền!"
+                    nzMode="multiple">
+                    <nz-option *ngFor="let roleItem of listOfRole" [nzValue]="roleItem.id"
+                               [nzLabel]="roleItem.name"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </div>
+            </nz-form-item>
+          </div>
+          <div class="ant-row">
+            <nz-form-item class="ant-col ant-col-sm-24 ant-col-md-24 ant-col-lg-12">
+              <div class="ant-row ant-form-item">
+                <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="email">Email</nz-form-label>
+                <nz-form-control [nzSpan]="12" nzErrorTip="Nhập email!">
+                  <input  formControlName="email" type="email" nz-input placeholder="Nhập email"/>
+                </nz-form-control>
+              </div>
+            </nz-form-item>
+            <nz-form-item class="ant-col ant-col-sm-24 ant-col-md-24 ant-col-lg-12">
+              <div class="ant-row ant-form-item">
+                <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="phone">Số điện thoại</nz-form-label>
+                <nz-form-control  [nzSpan]="12" nzErrorTip="Nhập số điện thoại!">
+                  <input formControlName="phone" type="tel" nz-input
+                         placeholder="Nhập số điện thoại"/>
+                </nz-form-control>
+              </div>
+            </nz-form-item>
+          </div>
+          <div class="ant-row">
+            <nz-form-item class="ant-col ant-col-sm-24 ant-col-md-24 ant-col-lg-12">
+              <div class="ant-row ant-form-item">
+                <nz-form-label class="text-left" [nzSpan]="8" nzRequired nzFor="fullName">Họ và tên</nz-form-label>
+                <nz-form-control  [nzSpan]="12" nzErrorTip="Nhập họ và tên!">
+                  <input formControlName="fullName" type="text" nz-input
+                         placeholder="Nhập họ và tên"/>
+                </nz-form-control>
+              </div>
+            </nz-form-item>
+          </div>
+        </form>
+      </div>
+      <div *nzModalFooter>
+        <button nz-button nzType="default" nzDanger (click)="handleCancelEdit()" [disabled]="isSaving">Huỷ</button>
+        <button nz-button nzType="primary" [disabled]="!formEdit.valid" (click)="handleOkEdit()"
                 [nzLoading]="isConfirmLoading">Lưu
         </button>
       </div>
