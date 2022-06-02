@@ -30,8 +30,20 @@
           <li nz-menu-item nzMatchRouter>
             <a routerLink="/admin/user-management">User management</a>
           </li>
+          <li nz-submenu nzOpen nzTitle="Jobs Management" nzIcon="setting">
+            <ul>
+              <li nz-menu-item nzMatchRouter>
+                <a routerLink="/admin/jobs/skill-management">Skill management</a>
+              </li>
+              <li nz-menu-item nzMatchRouter>
+                <a routerLink="/admin/jobs/type-job-management">Types Job management</a>
+              </li>
+            </ul>
+          </li>
         </ul>
+
       </li>
+
     </ul>
   </nz-sider>
   <nz-layout>

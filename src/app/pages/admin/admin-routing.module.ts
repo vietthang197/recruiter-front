@@ -8,7 +8,8 @@ const routes: Routes = [
     path: '', component: AdminComponent , children: [
       {
         path: 'user-management', component: UserManagementComponent
-      }
+      },
+      { path: 'jobs', loadChildren: () => import('./job-management/jobs.module').then(m => m.JobsModule) }
     ] }
 ];
 
