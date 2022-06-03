@@ -6,7 +6,8 @@ import {TypeJobManagementComponent} from "./type-job-management/type-job-managem
 
 const routes: Routes = [
   {
-    path: '', component: JobsManagementComponent , children: [
+    path: ''
+    , children: [
       {
         path: 'skill-management', component: SkillManagementComponent
       },
